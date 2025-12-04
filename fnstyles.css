@@ -135,6 +135,7 @@ body{
 #taskList li{
     display: flex;
     align-items: center;
+    gap : 10px;
     justify-content: space-between;
     background-color: var(--sea-green);
     margin-bottom: 10px;
@@ -150,9 +151,11 @@ body{
 }
 
 #taskList li .checkbox{
+    -webkit-appearance: none;
+    appearance: none;
     min-width: 20px;
     height: 20px;
-    border: 2px, solid white;
+    border: 2px solid white;
     background: transparent;
     border-radius: 50%;
     cursor: pointer;
@@ -205,4 +208,37 @@ body{
 }
 .task-buttons .delete-btn{
     background-color: var(--grapefruit);
+}
+
+@media (max-width: 500px){
+    body{
+        padding: 10px;
+    }
+    container{
+        padding: 0;
+    }
+    .todo-app{
+        padding: 1.5rem 1rem;
+        max-width: 100%;
+    }
+
+    .todo-app h1{
+        font-size: 2rem;
+        text-align: center;
+    }
+    .input-area input{
+        font-size: 1rem;
+        padding: 8px 12px;
+    }
+
+    #taskList li{
+        font-size: 1rem;
+        padding: 8px;
+    }
+
+    .task-buttons button{
+        width: 25px;
+        height: 25px;
+    }   
+
 }
