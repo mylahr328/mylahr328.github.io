@@ -1,45 +1,92 @@
-/* 1pt student uses either the <script>....</script> within the document or links an external js doc 
-When you click on the hamburger menu  this icon: image.png  it shows and hides the side nav bar. I have already taken care of the positioning for you.    (2pts) 
-HINT you will need to create a global boolean that controls this (isOpen = true)  
-1 point:  click on the hamburger menu and the side menu hides 
-1 point: click on the hamburger menu and the side menu shows 
-When the nav bar is hidden, the page changes width  (3pts)  -- see figma file below 
-1 point:  When the side bar is shown - the content is in the original place 
-2 point:  When the side bar is not shown - the content moves over and takes up more room. 
-on MOBILE the side bar nav must take up the full screen, and users need to click the menu button to hide it again  (see figma file below and check out apple.com in the responsive view for more info)  (3pts)  HINT: this is easier than you think!!! This is just all CSS :) 
-1 point: the side bar is no longer on the top, it's hidden behind the hamburger menu 
-1 point: the nav bar is shown and hidden by the hamburger menu */
+document.addEventListener('DOMContentLoaded', () => {
+    const taskInput = document.getElementById('taskInput');
+    const submitButton = document.getElementById('submit');
+    const taskList = document.getElementById('taskList');
+    const progress = document.getElementById('progress');
+    const numbers = document.getElementById('numbers'); // 0/0 text
 
+    const updateProgress = () => {
+        const tasks = taskList.querySelectorAll('li');
+        const total = tasks.length;
 
-/*menu show/hide*/
-let isOpen = true; // nav starts open
+        if (total === 0) {
+            progress.style.width = '0%';
+            numbers.textContent = '0/0';
+            return;
+        }
 
-function hideBar() {
-    // grab the nav and the content area
-    const nav = document.getElementsByClassName('navStyle')[0];
-    const content = document.getElementsByClassName('container-content')[0];
+        const completedTasks = taskList.querySelectorAll('li.completed').length;
+        const percent = (completedTasks / total) * 100;
 
-    if (isOpen) {
-        // hide the nav
-        nav.style.display = "none";
+        progress.style.width = `${percent}%`;
+        numbers.textContent = `${completedTasks}/${total}`;
+    };
 
-        // let the content take the full width
-        content.style.position = "absolute";
-        content.style.left = "0";
-        content.style.width = "100%";
-    } else {
-        // show the nav
-        nav.style.display = "block";
+    const addTask = (event) => {
+        event.preventDefault();
 
-        // put the content back in its original place (matches your CSS)
-        content.style.position = "absolute";
-        content.style.left = "25vw";
-        content.style.width = "65vw";
-    }
+        const taskText = taskInput.value.trim();
+        if (!taskText) return;
 
-    // flip the boolean
-    isOpen = !isOpen;
-}
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <input type="checkbox" class="checkbox">
+            <span>${taskText}</span>
+            <div class="task-buttons">
+                <button class="edit-btn"><i class="fa-solid fa-pen-to-square"></i></button>
+                <button class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+            </div>
+        `;
 
-// when you click the menu circle, run hideBar()
-document.getElementById("menu").addEventListener("click", hideBar);
+        const checkbox = li.querySelector('.checkbox');
+        const editButton = li.querySelector('.edit-btn');
+        const deleteButton = li.querySelector('.delete-btn');
+
+        const updateCompletedState = () => {
+            if (checkbox.checked) {
+                li.classList.add('completed');
+                editButton.disabled = true;
+                editButton.style.opacity = '0.5';
+                editButton.style.cursor = 'not-allowed';
+            } else {
+                li.classList.remove('completed');
+                editButton.disabled = false;
+                editButton.style.opacity = '1';
+                editButton.style.cursor = 'pointer';
+            }
+            updateProgress();
+        };
+
+        checkbox.addEventListener('change', updateCompletedState);
+        updateCompletedState();
+
+        deleteButton.addEventListener('click', () => {
+            taskList.removeChild(li);
+            updateProgress();
+        });
+
+        editButton.addEventListener('click', () => {
+            if (!checkbox.checked) {
+                taskInput.value = li.querySelector('span').textContent;
+                taskList.removeChild(li);
+                updateProgress();
+                taskInput.focus();
+            }
+        });
+
+        taskList.appendChild(li);
+
+        taskInput.value = '';
+        taskInput.focus();
+
+        updateProgress();
+    };
+
+    submitButton.addEventListener('click', addTask);
+
+    taskInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            addTask(e);
+        }
+    });
+});
